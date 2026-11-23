@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sumatif Harian - PJOK Kelas IV (Fase B)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f0fdf4;
+        }
+        .option-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .option-card:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col text-slate-800">
+
+    <!-- Header -->
+    <header class="bg-emerald-600 text-white shadow-md sticky top-0 z-10">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-white/20 p-2 rounded-xl text-2xl">⚽</div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-extrabold tracking-tight">Sumatif Harian PJOK</h1>
+                    <p class="text-xs text-emerald-100 font-medium">Kelas IV (Fase B) • Semester Ganjil 2026/2027</p>
+                </div>
+            </div>
+            <div id="timer-badge" class="hidden bg-emerald-800/80 px-3.5 py-1.5 rounded-xl font-mono text-base font-bold border border-emerald-400/30 flex items-center gap-1.5">
+                <span>⏱️</span>
+                <span id="timer">70:00</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-4xl w-full mx-auto px-4 py-6">
+        
+        <!-- Start Screen -->
+        <div id="start-screen" class="bg-white rounded-3xl shadow-sm border border-emerald-100 p-6 sm:p-10 max-w-xl mx-auto text-center mt-2">
+            <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-5 text-4xl shadow-inner">
+                🏃‍♂️
+            </div>
+            <h2 class="text-2xl font-extrabold text-slate-900 mb-2">Asesmen Sumatif Harian PJOK</h2>
+            <p class="text-slate-600 text-sm sm:text-base mb-6 leading-relaxed">
+                Mencakup <strong>5 Tujuan Pembelajaran (TP 1 – TP 5)</strong>: Konsep Gerak Dasar & Air, Permainan & Fair Play, Senam & Pencak Silat, Kebugaran Jasmani & Denyut Nadi, serta Screen Time, Gizi Seimbang, & Cedera Ringan.
+            </p>
+            
+            <div class="bg-emerald-50/70 rounded-2xl p-4 mb-6 text-left text-sm space-y-2.5 border border-emerald-100">
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-500">Jumlah Soal</span>
+                    <span class="font-bold text-slate-800">25 Soal Pilihan Ganda (5 soal/TP)</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-500">Waktu Pengerjaan</span>
+                    <span class="font-bold text-slate-800">70 Menit</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-500">Sistem Penilaian</span>
+                    <span class="font-bold text-emerald-700">4 Poin / Soal (Maksimal 100)</span>
+                </div>
+            </div>
+
+            <div class="mb-6 text-left">
+                <label for="student-name" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Nama Siswa (Opsional)</label>
+                <input type="text" id="student-name" placeholder="Ketik nama lengkap..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-medium">
+            </div>
+
+            <button onclick="startQuiz()" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold rounded-2xl shadow-md shadow-emerald-600/20 transition text-base">
+                Mulai Kerjakan Kuis 🚀
+            </button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden space-y-5">
+            <!-- Top Progress & Navigation Bar -->
+            <div class="bg-white rounded-2xl shadow-sm border border-emerald-100 p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Navigasi Nomor Soal</span>
+                    <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200" id="answered-status">0 / 25 Terjawab</span>
+                </div>
+                <div id="nav-pills" class="grid grid-cols-5 sm:grid-cols-10 md:grid-cols-13 gap-1.5">
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="bg-white rounded-3xl shadow-sm border border-emerald-100 p-6 sm:p-8">
+                <div class="flex flex-wrap justify-between items-center gap-2 pb-4 mb-5 border-b border-slate-100">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="bg-emerald-100 text-emerald-800 font-extrabold px-3.5 py-1.5 rounded-xl text-sm">
+                            Soal <span id="q-num">1</span> / 25
+                        </span>
+                        <span id="tp-badge" class="bg-teal-50 text-teal-800 font-bold px-3 py-1.5 rounded-xl text-xs border border-teal-200">
+                            TP 1: Konsep Gerak Dasar
+                        </span>
+                    </div>
+                    <button onclick="toggleHint()" class="text-xs sm:text-sm font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3.5 py-1.5 rounded-xl transition flex items-center gap-1.5">
+                        <span>💡</span> Petunjuk
+                    </button>
+                </div>
+
+                <!-- Hint Box -->
+                <div id="hint-box" class="hidden mb-5 p-4 bg-amber-50 border-l-4 border-amber-400 text-amber-900 text-sm rounded-r-xl">
+                    <span class="font-bold">Petunjuk:</span> <span id="hint-text"></span>
+                </div>
+
+                <!-- Question Text -->
+                <p id="question-text" class="text-slate-900 text-base sm:text-lg font-semibold leading-relaxed mb-6 whitespace-pre-line">
+                </p>
+
+                <!-- Options -->
+                <div id="options-list" class="space-y-3">
+                </div>
+
+                <!-- Custom Modal Notification (replacing confirm()) -->
+                <div id="submit-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+                    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-xl border border-slate-100 text-center">
+                        <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl">
+                            📋
+                        </div>
+                        <h3 class="text-lg font-extrabold text-slate-900 mb-2">Kumpulkan Jawaban?</h3>
+                        <p id="modal-msg" class="text-sm text-slate-600 mb-6"></p>
+                        <div class="flex gap-3">
+                            <button onclick="closeModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm transition">
+                                Periksa Lagi
+                            </button>
+                            <button onclick="finishQuiz()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm shadow-sm transition">
+                                Ya, Kumpulkan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Controls -->
+                <div class="flex justify-between items-center mt-8 pt-5 border-t border-slate-100">
+                    <button id="btn-prev" onclick="prevQuestion()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm disabled:opacity-40 disabled:cursor-not-allowed transition">
+                        ← Sebelumnya
+                    </button>
+                    <button id="btn-next" onclick="nextQuestion()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm shadow-sm transition">
+                        Selanjutnya →
+                    </button>
+                    <button id="btn-submit" onclick="openSubmitModal()" class="hidden px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm shadow-md shadow-teal-600/20 transition">
+                        Selesai & Lihat Nilai ✓
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="hidden space-y-6">
+            <div class="bg-white rounded-3xl shadow-sm border border-emerald-100 p-6 sm:p-8 text-center">
+                <span class="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 font-bold text-xs rounded-full uppercase tracking-wider mb-2">Hasil Sumatif Harian PJOK</span>
+                <h2 class="text-2xl font-extrabold text-slate-900 mb-1" id="result-greeting">Hebat, Kamu Selesai!</h2>
+                <p class="text-slate-500 text-sm mb-6" id="result-subtitle">Berikut adalah nilai akhir dan pembahasan setiap soal.</p>
+
+                <div class="w-36 h-36 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex flex-col items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/25">
+                    <span class="text-xs font-bold uppercase tracking-widest opacity-90">Nilai Akhir</span>
+                    <span id="final-score" class="text-5xl font-extrabold">0</span>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 max-w-md mx-auto mb-6">
+                    <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-2xl">
+                        <div class="text-xl font-extrabold text-emerald-700" id="stat-correct">0</div>
+                        <div class="text-xs font-semibold text-emerald-600">Benar (×4)</div>
+                    </div>
+                    <div class="bg-rose-50 border border-rose-200 p-3 rounded-2xl">
+                        <div class="text-xl font-extrabold text-rose-700" id="stat-wrong">0</div>
+                        <div class="text-xs font-semibold text-rose-600">Salah</div>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 p-3 rounded-2xl">
+                        <div class="text-xl font-extrabold text-slate-700" id="stat-empty">0</div>
+                        <div class="text-xs font-semibold text-slate-500">Kosong</div>
+                    </div>
+                </div>
+
+                <button onclick="location.reload()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl text-sm shadow-sm transition">
+                    🔄 Ulangi Kuis
+                </button>
+            </div>
+
+            <!-- Answer Key & Rationale -->
+            <div class="bg-white rounded-3xl shadow-sm border border-emerald-100 p-6 sm:p-8">
+                <h3 class="text-lg font-extrabold text-slate-900 mb-4 pb-3 border-b border-slate-100">📖 Kunci Jawaban & Pembahasan</h3>
+                <div id="review-list" class="space-y-5">
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const questions = [
+            // TP 1: Konsep Gerak dan Variasi Gerak Dasar (No. 1-5)
+            {
+                tp: "TP 1: Konsep Gerak & Aktivitas Air",
+                q: "Perhatikan gerakan berikut!\n(1) berlari\n(2) meliukkan badan di tempat\n(3) melompat melewati rintangan\n(4) menekuk lutut di tempat\n\nGerak tanpa berpindah tempat (non-lokomotor) ditunjukkan oleh nomor ….",
+                options: [
+                    "(1) dan (2)",
+                    "(2) dan (4)",
+                    "(2) dan (3)",
+                    "(1) dan (4)"
+                ],
+                correct: 1,
+                hint: "Gerak non-lokomotor dilakukan di tempat tanpa memindahkan posisi tubuh dari satu titik ke titik lain.",
+                rationale: "Meliukkan badan di tempat (2) dan menekuk lutut di tempat (4) tidak memindahkan posisi tubuh, sehingga termasuk gerak non-lokomotor. Berlari dan melompat melewati rintangan adalah gerak lokomotor."
+            },
+            {
+                tp: "TP 1: Konsep Gerak & Aktivitas Air",
+                q: "Anton berlari zig-zag di antara kerucut yang disusun di lapangan. Unsur kesadaran ruang yang diterapkan Anton adalah ….",
+                options: [
+                    "jalur",
+                    "tenaga",
+                    "waktu",
+                    "aliran"
+                ],
+                correct: 0,
+                hint: "Pola lintasan yang dilalui tubuh saat bergerak (lurus, melengkung, atau zig-zag).",
+                rationale: "Dalam kesadaran ruang, bentuk lintasan gerak seperti lurus, melengkung, atau berkelok-kelok (zig-zag) disebut unsur jalur."
+            },
+            {
+                tp: "TP 1: Konsep Gerak & Aktivitas Air",
+                q: "Dalam permainan kecepatan jalan dan lari, guru meniup peluit tiga kali dan semua murid berlari secepat-cepatnya. Konsep gerak yang diterapkan murid adalah kesadaran ….",
+                options: [
+                    "ruang, unsur arah",
+                    "ruang, unsur level",
+                    "hubungan, dengan teman",
+                    "upaya, unsur waktu (cepat–lambat)"
+                ],
+                correct: 3,
+                hint: "Perhatikan perintah guru agar murid berlari 'secepat-cepatnya'.",
+                rationale: "Kecepatan gerakan (cepat atau lambat) termasuk dalam konsep kesadaran upaya pada unsur waktu."
+            },
+            {
+                tp: "TP 1: Konsep Gerak & Aktivitas Air",
+                q: "Sebelum melakukan kegiatan bergerak di kolam renang, hal yang harus dilakukan agar aman adalah ….",
+                options: [
+                    "langsung melompat ke dalam kolam",
+                    "makan sampai sangat kenyang",
+                    "melakukan pemanasan ringan serta memeriksa kondisi air dan fasilitas sekitar",
+                    "berenang sendirian tanpa pengawasan"
+                ],
+                correct: 2,
+                hint: "Utamakan keselamatan tubuh dan pengecekan lingkungan kolam sebelum masuk ke air.",
+                rationale: "Pemanasan mencegah kram otot, sedangkan memeriksa kedalaman air dan fasilitas sekitar mencegah cedera saat beraktivitas di air."
+            },
+            {
+                tp: "TP 1: Konsep Gerak & Aktivitas Air",
+                q: "Rani dan Dita melempar dan menangkap bola secara berpasangan. Kesadaran hubungan yang diterapkan keduanya adalah ….",
+                options: [
+                    "bekerja sama dengan teman dan mengendalikan bola agar mudah ditangkap",
+                    "berlari sendiri tanpa memakai bola",
+                    "hanya mengubah level gerak dari rendah ke tinggi",
+                    "bergerak cepat tanpa memperhatikan pasangan"
+                ],
+                correct: 0,
+                hint: "Gerak berpasangan membutuhkan koordinasi antara pengirim dan penerima bola.",
+                rationale: "Kesadaran hubungan dalam gerak manipulatif berpasangan ditunjukkan melalui kerja sama dan kontrol lemparan agar pasangan mudah menangkap bola."
+            },
+
+            // TP 2: Permainan dan Nilai Fair Play (No. 6-10)
+            {
+                tp: "TP 2: Permainan & Fair Play",
+                q: "Dalam suatu permainan, setiap tim berusaha membawa bola ke wilayah lawan dan memasukkannya ke gawang, sambil menjaga gawang sendiri. Permainan ini termasuk permainan ….",
+                options: [
+                    "net",
+                    "target",
+                    "kooperatif",
+                    "invasi"
+                ],
+                correct: 3,
+                hint: "Permainan yang bertujuan memasuki wilayah pertahanan lawan untuk mencetak skor.",
+                rationale: "Permainan invasi (seperti sepak bola, bola basket, bola tangan) adalah permainan tim yang bertujuan menyerang wilayah lawan untuk mencetak gol/poin sekaligus mempertahankan area sendiri."
+            },
+            {
+                tp: "TP 2: Permainan & Fair Play",
+                q: "Pasangan permainan dan jenisnya yang tepat adalah ….",
+                options: [
+                    "bulu tangkis – permainan net",
+                    "boling – permainan invasi",
+                    "sepak bola – permainan target",
+                    "panahan – permainan lapangan"
+                ],
+                correct: 0,
+                hint: "Cari permainan yang menggunakan jaring pemisah di tengah lapangan.",
+                rationale: "Bulu tangkis menggunakan net sebagai pemisah area bermain sehingga termasuk permainan net. Boling dan panahan adalah permainan target, sedangkan sepak bola adalah permainan invasi."
+            },
+            {
+                tp: "TP 2: Permainan & Fair Play",
+                q: "Tim Lebah sedang bertahan karena bola dikuasai lawan dalam permainan bola keranjang. Strategi bertahan yang paling tepat adalah ….",
+                options: [
+                    "semua pemain berlari ke keranjang lawan dan meninggalkan keranjang sendiri",
+                    "semua pemain diam di tengah lapangan",
+                    "menjaga lawan dan menutup ruang gerak lawan agar sulit mencetak angka",
+                    "menjauhi bola agar tidak ditabrak"
+                ],
+                correct: 2,
+                hint: "Tujuan bertahan adalah mencegah lawan mendekati keranjang dan mencetak skor.",
+                rationale: "Strategi bertahan yang efektif dilakukan dengan mengawal pemain lawan (marking) dan menutup ruang tembak agar lawan kesulitan mencetak angka."
+            },
+            {
+                tp: "TP 2: Permainan & Fair Play",
+                q: "Saat bermain, bola yang disentuh Dani keluar lapangan, tetapi wasit tidak melihatnya. Sikap fair play yang harus ditunjukkan Dani adalah ….",
+                options: [
+                    "diam saja karena wasit tidak melihat",
+                    "mengakui kesalahan dengan jujur",
+                    "menyalahkan temannya",
+                    "memprotes lawan"
+                ],
+                correct: 1,
+                hint: "Fair play menjunjung tinggi kejujuran dan sportivitas meski tidak diawasi wasit.",
+                rationale: "Mengakui bola keluar secara jujur merupakan wujud nyata sikap sportif dan fair play dalam olahraga."
+            },
+            {
+                tp: "TP 2: Permainan & Fair Play",
+                q: "Dalam permainan bola keranjang, tim yang sedang menguasai bola menggunakan strategi menyerang yang tepat, yaitu ….",
+                options: [
+                    "memegang bola selama mungkin tanpa mengoper",
+                    "semua pemain berkumpul di satu tempat",
+                    "mengoper bola ke teman yang tidak dijaga dan bergerak ke ruang kosong",
+                    "melempar bola sejauh-jauhnya ke luar lapangan"
+                ],
+                correct: 2,
+                hint: "Kerja sama tim dan mencari posisi terbuka sangat penting saat menyerang.",
+                rationale: "Mengoper bola kepada rekan yang bebas dari penjagaan lalu bergerak mencari ruang kosong membuka peluang mencetak angka."
+            },
+
+            // TP 3: Gerak Berirama, Senam Lantai, Pencak Silat (No. 11-15)
+            {
+                tp: "TP 3: Gerak Berirama, Senam & Silat",
+                q: "Aktivitas gerak berirama adalah rangkaian gerak langkah kaki, ayunan lengan, dan sikap badan yang diiringi ….",
+                options: [
+                    "suara kendaraan",
+                    "tepukan penonton",
+                    "irama atau musik",
+                    "bunyi peluit"
+                ],
+                correct: 2,
+                hint: "Sesuai namanya, gerak ini menyelaraskan gerakan tubuh dengan ketukan nada atau lagu.",
+                rationale: "Gerak berirama (senam irama) memadukan langkah kaki dan ayunan lengan yang selaras dengan ketukan irama atau musik."
+            },
+            {
+                tp: "TP 3: Gerak Berirama, Senam & Silat",
+                q: "Cara melakukan sikap lilin yang benar adalah ….",
+                options: [
+                    "berdiri tegak, satu kaki diluruskan ke belakang, lengan lurus ke samping",
+                    "tengkurap, kedua lengan menopang badan",
+                    "duduk bersila, kedua tangan di atas kepala",
+                    "tidur telentang, kedua kaki rapat diangkat lurus ke atas, kedua tangan menopang pinggang"
+                ],
+                correct: 3,
+                hint: "Posisi tubuh terbalik bertumpu pada pundak dengan kaki lurus mengarah ke atas seperti batang lilin.",
+                rationale: "Sikap lilin diawali tidur telentang, kemudian mengangkat kedua kaki rapat lurus ke atas dengan pinggang ditopang kedua tangan dan bertumpu pada pundak."
+            },
+            {
+                tp: "TP 3: Gerak Berirama, Senam & Silat",
+                q: "Alat bantu yang digunakan untuk melakukan lompat kangkang adalah ….",
+                options: [
+                    "peti lompat dan matras",
+                    "bola dan raket",
+                    "tali dan kerucut",
+                    "gawang dan net"
+                ],
+                correct: 0,
+                hint: "Alat untuk tumpuan tangan saat melompat dan alas empuk untuk mendarat dengan aman.",
+                rationale: "Lompat kangkang menggunakan peti lompat sebagai rintangan tumpuan tangan dan matras sebagai alas pendaratan yang aman."
+            },
+            {
+                tp: "TP 3: Gerak Berirama, Senam & Silat",
+                q: "Dalam pencak silat, serangan dapat dilakukan dengan tangan dan kaki. Serangan tersebut berturut-turut disebut ….",
+                options: [
+                    "kuda-kuda dan pukulan",
+                    "pukulan dan tendangan",
+                    "tendangan dan kuda-kuda",
+                    "sikap pasang dan pukulan"
+                ],
+                correct: 1,
+                hint: "Perhatikan urutan alat gerak yang disebutkan: pertama tangan, kedua kaki.",
+                rationale: "Dalam pencak silat, serangan menggunakan tangan disebut pukulan, sedangkan serangan menggunakan kaki disebut tendangan."
+            },
+            {
+                tp: "TP 3: Gerak Berirama, Senam & Silat",
+                q: "Rina merangkai gerak senam: diawali keseimbangan satu kaki, dilanjutkan lompat melewati peti lompat, dan diakhiri berguling. Rangkaian yang benar adalah ….",
+                options: [
+                    "berguling, lompat kangkang, sikap kapal terbang",
+                    "lompat kangkang, berguling, sikap kapal terbang",
+                    "sikap kapal terbang, berguling, lompat kangkang",
+                    "sikap kapal terbang, lompat kangkang melewati peti lompat, berguling"
+                ],
+                correct: 3,
+                hint: "Cocokkan urutan gerak: (1) keseimbangan satu kaki, (2) lompat peti, (3) berguling.",
+                rationale: "Sikap kapal terbang melatih keseimbangan satu kaki, dilanjutkan lompat kangkang melewati peti lompat, dan diakhiri gerak berguling."
+            },
+
+            // TP 4: Aktivitas Fisik Menyenangkan, Kebugaran Jasmani, Denyut Nadi (No. 16-20)
+            {
+                tp: "TP 4: Kebugaran Jasmani & Denyut Nadi",
+                q: "Faktor yang tidak membuat aktivitas fisik dalam bentuk permainan sederhana menjadi menyenangkan adalah ….",
+                options: [
+                    "bermain bersama teman",
+                    "ada tantangan dan persaingan yang sehat",
+                    "tubuh menjadi lebih sehat",
+                    "harus selalu menang dan marah jika kalah"
+                ],
+                correct: 3,
+                hint: "Cari sikap negatif yang merusak suasana gembira saat bermain bersama.",
+                rationale: "Sikap memaksakan diri harus selalu menang dan marah ketika kalah merusak sportivitas dan membuat permainan tidak menyenangkan."
+            },
+            {
+                tp: "TP 4: Kebugaran Jasmani & Denyut Nadi",
+                q: "Dina menghitung denyut nadinya selama 15 detik dan merasakan 20 denyutan. Denyut nadi Dina per menit adalah ….",
+                options: [
+                    "60",
+                    "70",
+                    "80",
+                    "90"
+                ],
+                correct: 2,
+                hint: "Satu menit sama dengan 60 detik (4 kali dari 15 detik). Kalikan jumlah denyutan dengan 4.",
+                rationale: "Karena 1 menit = 60 detik (60 ÷ 15 = 4), maka denyut nadi per menit = 20 denyutan × 4 = 80 denyutan/menit."
+            },
+            {
+                tp: "TP 4: Kebugaran Jasmani & Denyut Nadi",
+                q: "Latihan lari bolak-balik (shuttle run) dan lari zig-zag bertujuan untuk meningkatkan ….",
+                options: [
+                    "kelincahan",
+                    "kekuatan otot lengan",
+                    "daya tahan otot",
+                    "kekuatan otot perut"
+                ],
+                correct: 0,
+                hint: "Kemampuan tubuh mengubah arah gerakan dengan cepat tanpa kehilangan keseimbangan.",
+                rationale: "Lari bolak-balik (shuttle run) dan lari zig-zag melatih kemampuan mengubah arah dengan cepat, yaitu kelincahan (agility)."
+            },
+            {
+                tp: "TP 4: Kebugaran Jasmani & Denyut Nadi",
+                q: "Latihan yang tepat untuk meningkatkan kekuatan otot perut adalah ….",
+                options: [
+                    "push-up",
+                    "sit-up dengan posisi kaki ditekuk",
+                    "lompat tali",
+                    "lari cepat 50 meter"
+                ],
+                correct: 1,
+                hint: "Gerakan mengangkat tubuh bagian atas dari posisi tidur telentang menuju posisi duduk.",
+                rationale: "Sit-up dengan lutut ditekuk secara langsung melatih kontraksi dan kekuatan otot perut."
+            },
+            {
+                tp: "TP 4: Kebugaran Jasmani & Denyut Nadi",
+                q: "Cara mengukur denyut nadi di pergelangan tangan yang benar adalah ….",
+                options: [
+                    "menempelkan jari telunjuk dan jari tengah pada pergelangan tangan bagian dalam, lalu menghitung denyutan selama 15 atau 60 detik",
+                    "menempelkan jari pada punggung tangan dan menghitung selama 5 detik",
+                    "meletakkan telapak tangan di dahi lalu menghitung selama 1 detik",
+                    "menekan perut dengan jari lalu menghitung selama 10 menit"
+                ],
+                correct: 0,
+                hint: "Gunakan ujung jari telunjuk dan jari tengah (bukan ibu jari) pada jalur pembuluh nadi di pergelangan dalam.",
+                rationale: "Denyut nadi arteri radialis dirasakan dengan menempelkan ujung jari telunjuk dan jari tengah pada pergelangan tangan bagian dalam (segaris ibu jari) selama 15 atau 60 detik."
+            },
+
+            // TP 5: Screen Time, Gizi Seimbang, Cedera Ringan (No. 21-25)
+            {
+                tp: "TP 5: Screen Time, Gizi & Cedera Ringan",
+                q: "Rafi bermain game di ponsel sampai larut malam. Cahaya layar mengganggu hormon pengatur tidurnya. Dampak yang paling mungkin dialami Rafi keesokan harinya adalah ….",
+                options: [
+                    "tubuh lebih segar dan mudah berkonsentrasi",
+                    "mengantuk dan sulit berkonsentrasi di sekolah",
+                    "nafsu makan meningkat dan otot lebih kuat",
+                    "mata menjadi lebih sehat"
+                ],
+                correct: 1,
+                hint: "Kurang tidur akibat paparan layar gawai di malam hari menurunkan kesiapan belajar di pagi hari.",
+                rationale: "Cahaya biru layar menghambat hormon melatonin sehingga waktu tidur berkurang dan menyebabkan kantuk serta sulit berkonsentrasi di sekolah."
+            },
+            {
+                tp: "TP 5: Screen Time, Gizi & Cedera Ringan",
+                q: "Cara mengelola screen time yang tepat adalah ….",
+                options: [
+                    "menetapkan batas waktu harian dan mengisi waktu luang dengan bermain di luar ruangan",
+                    "bermain gawai sebelum tidur agar cepat mengantuk",
+                    "bermain game sepanjang hari saat libur",
+                    "menonton televisi sambil makan"
+                ],
+                correct: 0,
+                hint: "Seimbangkan waktu penggunaan layar dengan aktivitas fisik yang aktif.",
+                rationale: "Membatasi durasi harian penggunaan gawai dan menggantinya dengan aktivitas fisik di luar ruangan adalah cara sehat mengelola screen time."
+            },
+            {
+                tp: "TP 5: Screen Time, Gizi & Cedera Ringan",
+                q: "Menu makan siang Dewi terdiri atas nasi, ayam goreng, tumis bayam, pisang, dan air putih. Pengelompokan makanan berdasarkan zat gizinya yang tepat adalah ….",
+                options: [
+                    "nasi – protein",
+                    "ayam goreng – karbohidrat",
+                    "pisang – protein",
+                    "bayam – vitamin dan mineral"
+                ],
+                correct: 3,
+                hint: "Nasi mengandung karbohidrat, ayam mengandung protein, sedangkan sayur dan buah kaya vitamin serta mineral.",
+                rationale: "Sayuran hijau seperti bayam kaya akan vitamin dan mineral. Nasi adalah sumber karbohidrat, dan ayam goreng adalah sumber protein."
+            },
+            {
+                tp: "TP 5: Screen Time, Gizi & Cedera Ringan",
+                q: "Pergelangan kaki Tomi terkilir saat bermain. Langkah pertolongan pertama yang tepat adalah ….",
+                options: [
+                    "memijat dengan keras, memberi kompres hangat, lalu menyuruh Tomi berjalan",
+                    "membalut dengan sangat kencang, memberi kompres panas, lalu menyuruh Tomi berlari",
+                    "mengistirahatkan kaki, memberi kompres dingin, membalut, dan meninggikan kaki",
+                    "menggerakkan pergelangan kaki berulang-ulang agar tidak kaku"
+                ],
+                correct: 2,
+                hint: "Ingat prinsip penanganan cedera jaringan lunak: RICE (Rest, Ice, Compression, Elevation).",
+                rationale: "Penanganan awal terkilir mengikuti metode RICE: Rest (istirahatkan), Ice (kompres dingin/es), Compression (balut lembut), dan Elevation (tinggikan bagian cedera)."
+            },
+            {
+                tp: "TP 5: Screen Time, Gizi & Cedera Ringan",
+                q: "Rina sering menunduk menatap ponsel selama berjam-jam sehingga lehernya terasa kaku dan nyeri. Hal ini merupakan dampak screen time berupa ….",
+                options: [
+                    "gangguan tidur",
+                    "sakit leher dan punggung",
+                    "kesulitan mengendalikan diri",
+                    "gangguan pendengaran"
+                ],
+                correct: 1,
+                hint: "Posisi menunduk terlalu lama membebani otot dan tulang belakang bagian atas.",
+                rationale: "Menunduk menatap layar gawai dalam waktu lama menyebabkan ketegangan otot yang berdampak pada sakit leher dan punggung."
+            }
+        ];
+
+        let currentIndex = 0;
+        let answers = new Array(questions.length).fill(null);
+        let secondsLeft = 70 * 60;
+        let timerId;
+
+        function startQuiz() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            document.getElementById('timer-badge').classList.remove('hidden');
+            renderNavPills();
+            renderQuestion(0);
+            startTimer();
+        }
+
+        function startTimer() {
+            timerId = setInterval(() => {
+                secondsLeft--;
+                const m = Math.floor(secondsLeft / 60);
+                const s = secondsLeft % 60;
+                document.getElementById('timer').textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                if (secondsLeft <= 0) {
+                    clearInterval(timerId);
+                    finishQuiz();
+                }
+            }, 1000);
+        }
+
+        function renderNavPills() {
+            const container = document.getElementById('nav-pills');
+            container.innerHTML = '';
+            const answeredCount = answers.filter(a => a !== null).length;
+            document.getElementById('answered-status').textContent = `${answeredCount} / ${questions.length} Terjawab`;
+
+            questions.forEach((_, i) => {
+                const btn = document.createElement('button');
+                btn.textContent = i + 1;
+                btn.onclick = () => renderQuestion(i);
+                
+                let cls = "h-8 sm:h-9 rounded-xl font-bold text-xs border transition ";
+                if (i === currentIndex) {
+                    cls += "bg-emerald-600 text-white border-emerald-600 shadow-sm";
+                } else if (answers[i] !== null) {
+                    cls += "bg-teal-100 text-teal-900 border-teal-400";
+                } else {
+                    cls += "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100";
+                }
+                btn.className = cls;
+                container.appendChild(btn);
+            });
+        }
+
+        function renderQuestion(idx) {
+            currentIndex = idx;
+            const item = questions[idx];
+            
+            document.getElementById('q-num').textContent = idx + 1;
+            document.getElementById('tp-badge').textContent = item.tp;
+            document.getElementById('question-text').textContent = item.q;
+            document.getElementById('hint-text').textContent = item.hint;
+            document.getElementById('hint-box').classList.add('hidden');
+
+            const optionsList = document.getElementById('options-list');
+            optionsList.innerHTML = '';
+            const labels = ['a', 'b', 'c', 'd'];
+
+            item.options.forEach((opt, optIdx) => {
+                const selected = answers[idx] === optIdx;
+                const btn = document.createElement('button');
+                btn.onclick = () => chooseOption(optIdx);
+                btn.className = `option-card w-full text-left p-4 rounded-2xl border-2 flex items-center gap-3.5 ${
+                    selected 
+                    ? 'bg-emerald-50 border-emerald-500 text-emerald-950 font-bold shadow-sm' 
+                    : 'bg-white border-slate-100 hover:border-emerald-200 hover:bg-slate-50 text-slate-700 font-medium'
+                }`;
+
+                btn.innerHTML = `
+                    <span class="w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center text-sm font-extrabold uppercase ${
+                        selected ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600'
+                    }">${labels[optIdx]}</span>
+                    <span class="text-sm sm:text-base">${opt}</span>
+                `;
+                optionsList.appendChild(btn);
+            });
+
+            document.getElementById('btn-prev').disabled = idx === 0;
+            if (idx === questions.length - 1) {
+                document.getElementById('btn-next').classList.add('hidden');
+                document.getElementById('btn-submit').classList.remove('hidden');
+            } else {
+                document.getElementById('btn-next').classList.remove('hidden');
+                document.getElementById('btn-submit').classList.add('hidden');
+            }
+
+            renderNavPills();
+        }
+
+        function chooseOption(optIdx) {
+            answers[currentIndex] = optIdx;
+            renderQuestion(currentIndex);
+        }
+
+        function toggleHint() {
+            document.getElementById('hint-box').classList.toggle('hidden');
+        }
+
+        function prevQuestion() {
+            if (currentIndex > 0) renderQuestion(currentIndex - 1);
+        }
+
+        function nextQuestion() {
+            if (currentIndex < questions.length - 1) renderQuestion(currentIndex + 1);
+        }
+
+        function openSubmitModal() {
+            const empty = answers.filter(a => a === null).length;
+            const msg = empty > 0 
+                ? `Masih ada ${empty} soal yang belum kamu jawab. Yakin ingin mengumpulkan sekarang?`
+                : "Semua 25 soal sudah dijawab! Siap melihat nilai dan pembahasan?";
+            document.getElementById('modal-msg').textContent = msg;
+            document.getElementById('submit-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('submit-modal').classList.add('hidden');
+        }
+
+        function finishQuiz() {
+            closeModal();
+            clearInterval(timerId);
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('timer-badge').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+
+            const name = document.getElementById('student-name').value.trim();
+            if (name) {
+                document.getElementById('result-greeting').textContent = `Hebat, ${name}!`;
+                document.getElementById('result-subtitle').textContent = `Nama: ${name} — Berikut nilai dan pembahasan lengkap.`;
+            }
+
+            let correct = 0, wrong = 0, empty = 0;
+            const reviewList = document.getElementById('review-list');
+            reviewList.innerHTML = '';
+            const labels = ['a', 'b', 'c', 'd'];
+
+            questions.forEach((item, i) => {
+                const ans = answers[i];
+                const isRight = ans === item.correct;
+
+                if (ans === null) empty++;
+                else if (isRight) correct++;
+                else wrong++;
+
+                const box = document.createElement('div');
+                box.className = `p-5 rounded-2xl border ${
+                    ans === null ? 'bg-slate-50 border-slate-200' :
+                    isRight ? 'bg-emerald-50/50 border-emerald-200' : 'bg-rose-50/50 border-rose-200'
+                }`;
+
+                const badge = ans === null
+                    ? `<span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-200 text-slate-700">Kosong</span>`
+                    : isRight
+                        ? `<span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800">✓ Benar (+4)</span>`
+                        : `<span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-rose-100 text-rose-800">✗ Salah</span>`;
+
+                box.innerHTML = `
+                    <div class="flex flex-wrap justify-between items-center gap-2 mb-2">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="font-extrabold text-slate-800 text-sm">Soal Nomor ${i + 1}</span>
+                            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-teal-100 text-teal-800">${item.tp}</span>
+                        </div>
+                        ${badge}
+                    </div>
+                    <p class="text-slate-900 font-semibold text-sm sm:text-base mb-3 whitespace-pre-line">${item.q}</p>
+                    <div class="text-xs sm:text-sm space-y-1 mb-3">
+                        <p class="text-slate-700"><strong>Jawabanmu:</strong> ${ans !== null ? `${labels[ans]}. ${item.options[ans]}` : 'Tidak dijawab'}</p>
+                        <p class="text-emerald-700"><strong>Kunci Jawaban:</strong> ${labels[item.correct]}. ${item.options[item.correct]}</p>
+                    </div>
+                    <div class="bg-white p-3.5 rounded-xl border border-slate-200/80 text-xs sm:text-sm text-slate-600">
+                        <strong class="text-slate-800">Pembahasan:</strong> ${item.rationale}
+                    </div>
+                `;
+                reviewList.appendChild(box);
+            });
+
+            document.getElementById('final-score').textContent = correct * 4;
+            document.getElementById('stat-correct').textContent = correct;
+            document.getElementById('stat-wrong').textContent = wrong;
+            document.getElementById('stat-empty').textContent = empty;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
